@@ -6,7 +6,7 @@ tiprack = labware.load('opentrons-tiprack-300ul', '1')
 
 plate = labware.load('96-flat', '2')
 #create custom plate if it does not currently exist in robot software
-plate_agar='agar_plate_5'
+plate_agar='agar_plate_8_8_8'
 if plate_agar not in labware.list():
 	#print('hi')
 	custom_plate = labware.create(
@@ -29,12 +29,19 @@ pipette = instruments.P300_Single(
 # pipette.dispense(20, plate2.wells('A1'))
 
 #Testing drops along single column
-pipette.transfer(20, 
-				plate.wells('A1', 'B1'),
-				plate2.wells('A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'))
+# pipette.transfer(7, 
+# 				plate.wells('A1', 'B1'),
+# 				plate2.wells('A1', 'B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'))
 
 # Testing drops along single row
 # pipette.transfer(20, 
 # 				plate.wells('A1', 'B1', 'C1'),
 # 				plate2.wells('A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12'))
 
+# Testing drops along first row & column
+pipette.transfer(14, 
+				plate.wells('A1'),
+				plate2.wells('B1', 'C1', 'D1', 'E1', 'F1', 'G1', 'H1'))
+pipette.transfer(14, 
+				plate.wells('B1', 'C1'),
+				plate2.wells('A1', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9', 'A10', 'A11', 'A12'))
