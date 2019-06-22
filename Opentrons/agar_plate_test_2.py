@@ -6,14 +6,14 @@ tiprack = labware.load('opentrons-tiprack-300ul', '1')
 
 plate = labware.load('96-flat', '2')
 #create custom plate if it does not currently exist in robot software
-plate_agar='agar_plate_8_8_8'
+plate_agar='agar_plate_9_9_9'
 if plate_agar not in labware.list():
 	#print('hi')
 	custom_plate = labware.create(
 	        plate_agar,                    # name of you labware
 	        grid=(12, 8),                    # specify amount of (columns, rows)
-	        spacing=(8, 8),               # distances (mm) between each (column, row)
-	        diameter=8,                     # diameter (mm) of each well on the plate
+	        spacing=(9, 9),               # distances (mm) between each (column, row)
+	        diameter=9,                     # diameter (mm) of each well on the plate
 	        depth=5,                       # depth (mm) of each well on the plate
 	        volume=200)
 
