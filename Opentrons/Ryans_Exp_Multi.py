@@ -61,7 +61,7 @@ spot_vol = 7
 
 # 	pipette.drop_tip()
 	
-for i in range(1,2):
+for i in range(1,13):
 	# print(plate_1.columns(str(i)))
 	pipette.pick_up_tip()
 
