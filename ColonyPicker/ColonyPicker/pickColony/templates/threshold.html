@@ -1,8 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-<div>
-  <h1>Thresholding Page</h1>
-  <!-- <p> The size of the uploaded file is {{image.size}}</p> -->
-  <img src="{{url}}"/>
-	<div>
+<h1>Thresholding</h1>
+<div class="thresholdImages">
+    <img class="originalPetri" src="{{url}}"/>
+    <img class="binaryPetri" src="{{thresholdUrl}}"/>
+  </div>
+  <div class="button">
+    <form action='pick' method = 'POST'>
+      {% csrf_token %}
+      <input type="hidden" name="original" value={{url}}>
+      <input type="hidden" name="edit" value = {{thresholdUrl}}>
+      <button type='submit'>Pick Colonies</button>
+      </form>
+  </div>
 {% endblock %}

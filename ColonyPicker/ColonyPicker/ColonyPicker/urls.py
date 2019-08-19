@@ -24,7 +24,8 @@ from django.conf.urls.static import static
 urlpatterns = [
 	path('', views.home, name='home'),
     path('admin/', admin.site.urls),
-    path('threshold', views.threshold, name='threshold')
+    path('threshold', views.threshold, name='threshold'),
+    path('pick', views.pick, name='pick')
 ]
 
 if settings.DEBUG:
