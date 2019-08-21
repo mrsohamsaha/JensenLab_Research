@@ -6,8 +6,12 @@
   <h3>Constant: {{constant}}</h3>
 </div>
 <div class="thresholdImages">
-    <img class="originalPetri" src="{{url}}"/>
-    <img class="binaryPetri" src="{{thresholdUrl}}"/>
+    <img class="originalPetri" id='zoom1' src="{{url}}" data-zoom-image="{{url}}"/>
+    <div id="container">
+    </div>
+    <img class="binaryPetri" id='zoom2' src="{{thresholdUrl}}" data-zoom-image="{{thresholdUrl}}"/>
+    <div id="container2">
+    </div>
 </div>
 <div class="button">
   <form action='threshold' method = 'POST'>
