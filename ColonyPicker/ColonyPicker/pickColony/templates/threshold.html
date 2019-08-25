@@ -51,6 +51,8 @@
       {% csrf_token %}
       <input type="hidden" name="original" value={{url}}>
       <input type="hidden" name="edit" value = {{thresholdUrl}}>
+       <!--Input to keep track of first post request to pick page -->
+      <input type="hidden" name="fromThresh" value = 1>
       <button class="pickButton" type='submit'>Pick Colonies</button>
     </form>
 </div>

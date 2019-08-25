@@ -58,6 +58,39 @@ def threshold(request):
 	return render(request, 'threshold.html')
 
 def pick(request):
-	name1 = request.POST.get("original", "")
-	name2 = request.POST.get("edit", "")
-	return render(request, 'pick.html', {"original": name1, "edit": name2})
+	original = request.POST.get("original", "")
+	edit = request.POST.get("edit", "")
+	fromThresh = request.POST.get("fromThresh", "")
+	print(type(fromThresh))
+	print(fromThresh)
+
+	# Setting up Blob Detection Parameters
+	params = cv2.SimpleBlobDetector_Params()
+	params.filterByColor = True
+	params.blobColor = 255
+	params.filterByInertia = True
+	params.minInertiaRatio = 0.01
+	params.filterByConvexity = True
+	params.minConvexity = 0.9
+
+	# Detecting version of OpenCV
+	is_v2 = cv2.__version__.startswith("2.")
+	if is_v2:
+		detector = cv2.SimpleBlobDetector(params)
+	else:
+		detector = cv2.SimpleBlobDetector_create(params)
+
+	# Detecting Blobs
+	plateImage = cv2.imread(edit[1:],0)
+	keypoints = detector.detect(plateImage)
+
+	# Ranking Blobs
+
+	# Saving image with blob detection
+	fs = FileSystemStorage()
+	im_with_keypoints = cv2.drawKeypoints(plateImage, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+	name = original[7:-4] + "BLOB" + ".jpg"
+	cv2.imwrite('media/'+name, im_with_keypoints)
+	blobUrl = fs.url(name)
+	outDict = {"original": original, "edit": edit, "blob": blobUrl, "count": len(keypoints), "countSelected": len(keypoints)}
+	return render(request, 'pick.html', outDict)
