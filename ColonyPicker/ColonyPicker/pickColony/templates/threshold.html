@@ -6,16 +6,19 @@
   <!-- <h3></h3> -->
 </div>
 <div class="thresholdImages">
-    <img class="originalPetri" id='zoom1' src="{{url}}" data-zoom-image="{{url}}"/>
+    <img class="binaryPetri" id='zoom1' src="{{url}}" data-zoom-image="{{url}}"/>
     <img class="binaryPetri" id='zoom2' src="{{thresholdUrl}}" data-zoom-image="{{thresholdUrl}}"/>
     <script src='static/jquery-1.8.3.min.js'></script>
     <script src='static/jquery.elevateZoom-3.0.8.min.js'></script>
     <script>
-      $('#zoom1').elevateZoom({zoomWindowPosition: "container1", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollzoom: true});
+      $('#zoom1').elevateZoom({zoomWindowPosition: "container1", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollZoom: true});
       $('#zoom2').elevateZoom({zoomWindowPosition: "container2", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollZoom: true});
     </script>
+    <div style="display: none;" class="dummy">
+      Hello world!
+      </div>
 </div>
-<div class="thresholdImages">
+<div style="class="thresholdImages">
   <div style="background-color: white;
               height: 200px;
               width: 200px;  opacity: 0.4;"

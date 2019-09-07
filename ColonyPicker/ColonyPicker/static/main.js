@@ -28,3 +28,12 @@ function petSectionEndHover() {
         petSections[i].addEventListener('mouseout', petSectionEndHover);
     }
 }());
+
+$( document ).ready(function() {
+console.log( "ready!" );
+// if(document.getElementsByClassName("zoomWindow")[0].style.display == "none"){
+//   console.log('hi');
+// }
+var elements = document.getElementsByClassName("zoomWindow");
+console.log(elements.length);
+});
