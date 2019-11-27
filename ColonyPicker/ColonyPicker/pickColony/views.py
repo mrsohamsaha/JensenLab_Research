@@ -14,10 +14,12 @@ from .utils import binaryMask
 from .utils import detectColonies
 from .utils import analyzeColonies
 from .utils import highlightKeyPoints
+from .utils import rankColonies
 
 # global variables
 url = ""
 thresholdUrl = ""
+originalBlobList = None
 
 def home(request):
 	if request.method == 'POST':
@@ -52,24 +54,37 @@ def threshold(request):
 		binaryImage = binaryMask(originalImagePath[1:], blockSize, constant)
 		cv2.imwrite(binaryImagePath[1:], binaryImage)
 
-		outDict = {'url': name1, 'thresholdUrl': name2, 'blockSize': blockSize, 'constant': constant}
+		outDict = {'url': originalImagePath, 'thresholdUrl': binaryImagePath, 'blockSize': blockSize, 'constant': constant}
 		return render(request, 'threshold.html', outDict)
 	return render(request, 'threshold.html')
 
 def pick(request):
-	originalImagePath = request.POST.get("original", "")[1:]
-	binaryImagePath = request.POST.get("edit", "")[1:]
-	fromThresh = request.POST.get("fromThresh", "")
-
-	# Detecting Blobs
-	keypoints = detectColonies(originalImagePath, binaryImagePath)
-	blobList = analyzeColonies(keypoints, binaryImagePath)
-	binaryKeypoints, originalKeypoints = highlightKeyPoints(originalImagePath, binaryImagePath, blobList, len(blobList))
-
-	# Saving image with blob detection
-	fs = FileSystemStorage()
-	name = originalImagePath[7:-4] + "BLOB" + ".jpg"
-	cv2.imwrite('media/'+name, originalKeypoints)
-	blobUrl = fs.url(name)
-	outDict = {"original": originalImagePath, "edit": binaryImagePath, "blob": blobUrl, "count": len(blobList), "countSelected": len(blobList)}
-	return render(request, 'pick.html', outDict)
+	global originalBlobList
+	if request.method == 'POST':
+		originalImagePath = request.POST.get("original", "")
+		binaryImagePath = request.POST.get("edit", "")
+		fromThresh = request.POST.get("fromThresh", "")
+		binaryImage = cv2.imread(binaryImagePath[1:],0)
+		originalImage = cv2.imread(originalImagePath[1:])
+		cutoff = 0
+		# Detecting Blobs for first time
+		if fromThresh == "1":
+			keypoints = detectColonies(binaryImage)
+			blobList = analyzeColonies(keypoints, binaryImage)
+			originalBlobList = rankColonies(blobList)
+			cutoff = len(originalBlobList)
+		else:
+			cutoff = int(request.POST.get("cutoff", ""))
+		# keyPointList = [cv2.KeyPoint(x = blob.pt[0], y = blob.pt[1], _size = blob.size) for blob in originalBlobList]
+		binaryKeypoints, originalKeypoints = highlightKeyPoints(originalImage, binaryImage, originalBlobList, cutoff)
+		# Saving images with blob detection
+		fs = FileSystemStorage()
+		name = originalImagePath[7:-4] + "BLOB" + ".jpg"
+		nameBinary = binaryImagePath[7:-4] + "BLOB" + ".jpg"
+		cv2.imwrite('media/'+name, originalKeypoints)
+		cv2.imwrite('media/'+nameBinary, binaryKeypoints)
+		blobUrl = fs.url(name)
+		blobUrlBinary = fs.url(nameBinary)
+		outDict = {"original": originalImagePath, "edit": binaryImagePath, "blob": blobUrl, "blobBinary": blobUrlBinary, "count": len(originalBlobList), "cutoff": cutoff}
+		return render(request, 'pick.html', outDict)
+	return render(request, 'pick.html')

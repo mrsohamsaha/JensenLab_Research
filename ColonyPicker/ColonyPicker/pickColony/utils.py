@@ -3,6 +3,7 @@ import pandas as pd
 import cv2
 import numpy as np
 
+# Helper Classes and Functions
 class Blob(cv2.KeyPoint):
     def __init__(self, whitePix, darkPix, keyPoint):
         self.whitePix = whitePix
@@ -12,16 +13,20 @@ class Blob(cv2.KeyPoint):
 def dist(p1, p2):
     return math.sqrt((p2[0] -  p1[0])**2 + (p2[1] - p1[1])**2)
 
+def convert(blobList):
+    return [cv2.KeyPoint(x = blob.pt[0], y = blob.pt[1], _size = blob.size) for blob in blobList]
+
+# Main Functions
 def binaryMask(imagePath, blockSize, constant):
     plateImage = cv2.imread(imagePath,0)
     image = cv2.fastNlMeansDenoising(plateImage,None,10,7,21)
     adapGauss = cv2.adaptiveThreshold(image,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, blockSize, constant)
     return adapGauss
 
-def detectColonies(orginalImagePath, binaryImagePath):
+def detectColonies(binaryImage):
 
-    binaryImage = cv2.imread(binaryImagePath,0)
-    originalImage = cv2.imread(orginalImagePath)
+    # binaryImage = cv2.imread(binaryImagePath,0)
+    # originalImage = cv2.imread(orginalImagePath)
 
     params2 = cv2.SimpleBlobDetector_Params()
     params2.filterByColor = True
@@ -35,8 +40,9 @@ def detectColonies(orginalImagePath, binaryImagePath):
     keypoints = detector.detect(binaryImage)
     return keypoints
 
-def analyzeColonies(keyPoints, binaryImagePath):
-    binaryImage = cv2.imread(binaryImagePath,0)
+def analyzeColonies(keyPoints, binaryImage):
+    # binaryImage = cv2.imread(binaryImagePath,0)
+
     R = 32
     phi = 0.1
     width = len(binaryImage)
@@ -78,17 +84,24 @@ def analyzeColonies(keyPoints, binaryImagePath):
                         whiteCount += 1
         whitePix = whiteCount*100/outsideCount
         darkPix = darkCount*100/insideCount
-        blobList.append(Blob(whitePix, darkPix, keyPoint))
+        blobList.append((whitePix, darkPix, keyPoint))
+        # blobList.append(keyPoint)
     print("%d Viable Colonies Analyzed" % len(blobList))
     return blobList
-
-def convert(blobList):
-    return [cv2.KeyPoint(x = blob.pt[0], y = blob.pt[1], _size = blob.size) for blob in blobList]
-
-def highlightKeyPoints(originalImagePath, binaryImagePath, blobList, amount):
-    keypointList = convert(blobList)
-    binaryImage = cv2.imread(binaryImagePath,0)
-    originalImage = cv2.imread(originalImagePath)
+def rankColonies(blobList):
+    darkCutoff = np.percentile(np.array([blob[1] for blob in blobList]), 95)
+    whiteCutoff = np.percentile(np.array([blob[0] for blob in blobList]), 50)
+    for i,blob in enumerate(blobList):
+        if blob[1] > darkCutoff or  blob[0] > whiteCutoff:
+            blobList.remove(blob)
+    blobList.sort(key=lambda x: x[0])
+    print("%d Viable Colonies Extracted" % len(blobList))
+    keypointList = [blob[2] for blob in blobList]
+    return keypointList
+def highlightKeyPoints(originalImage, binaryImage, keypointList, amount):
+    # keypointList = convert(blobList)
+    # binaryImage = cv2.imread(binaryImagePath,0)
+    # originalImage = cv2.imread(originalImagePath)
     binaryKeypoints = cv2.drawKeypoints(binaryImage, keypointList[:amount], np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     originalKeypoints = cv2.drawKeypoints(originalImage, keypointList[:amount], np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     return (binaryKeypoints, originalKeypoints)

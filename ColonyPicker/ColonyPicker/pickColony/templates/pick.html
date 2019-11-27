@@ -2,23 +2,33 @@
 {% block content %}
 <h1>Pick Colonies</h1>
 <h4> Total Count: {{count}}</h4>
-<h4> Selected: {{countSelected}}</h4>
-<div>
+<h4> Selected: {{cutoff}}</h4>
+<div class="thresholdImages">
   <img class="originalPetri" id='zoom1' src="{{blob}}" data-zoom-image="{{blob}}"/>
+  <img class="binaryPetri" id='zoom2' src="{{blobBinary}}" data-zoom-image="{{blobBinary}}"/>
   <script src='static/jquery-1.8.3.min.js'></script>
   <script src='static/jquery.elevateZoom-3.0.8.min.js'></script>
   <script>
     $('#zoom1').elevateZoom({zoomWindowPosition: "container1", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollzoom: true});
+    $('#zoom2').elevateZoom({zoomWindowPosition: "container2", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollZoom: true});
   </script>
 </div>
-<div style="background-color: white;
-            height: 200px;
-            width: 200px;  opacity: 0.4;"
-            id="container1">
-            <div style="opacity:1;color: black;"> Zoomed view of the petri dish will appear here.</div>
+<div class ="thresholdImages">
+  <div style="background-color: white;
+              height: 200px;
+              width: 200px;  opacity: 0.4;"
+              id="container1">
+              <div style="opacity:1;color: black;"> Zoomed view of the petri dish will appear here.</div>
+  </div>
+  <div style="background-color: white;
+              height: 200px;
+              width: 200px;  opacity: 0.4; margin-left: 460px"
+              id="container2">
+              <div style="opacity:1;color: black;"> Zoomed view of the binary petri dish will appear here</div>
+  </div>
 </div>
 <div class="button">
-  <form action='threshold' method = 'POST'>
+  <form action='pick' method = 'POST'>
     {% csrf_token %}
     <input type="hidden" name="original" value={{original}}>
     <input type="hidden" name="edit" value = {{edit}}>
@@ -26,8 +36,8 @@
     <input type="hidden" name="fromThresh" value = 0>
 
     <label for="cutoffId">Cutoff</label>
-    <input type="range" name="cutoff" id="cutoffId" value={{count}} min=1 max={{count}} step="1" oninput="cutoffOutId.value = cutoffId.value">
-    <output name="cutoffOut" id="cutoffOutId">{{count}}</output>
+    <input type="range" name="cutoff" id="cutoffId" value={{cutoff}} min=1 max={{count}} step="1" oninput="cutoffOutId.value = cutoffId.value">
+    <output name="cutoffOut" id="cutoffOutId">{{cutoff}}</output>
 
     <button type='submit'>Update Colony Count</button>
   </form>
