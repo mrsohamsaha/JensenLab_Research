@@ -4,14 +4,14 @@
 <h4> Total Count: {{count}}</h4>
 <h4> Selected: {{cutoff}}</h4>
 <div class="thresholdImages">
-  <img class="originalPetri" id='zoom1' src="{{blob}}" data-zoom-image="{{blob}}"/>
-  <img class="binaryPetri" id='zoom2' src="{{blobBinary}}" data-zoom-image="{{blobBinary}}"/>
-  <script src='static/jquery-1.8.3.min.js'></script>
-  <script src='static/jquery.elevateZoom-3.0.8.min.js'></script>
-  <script>
-    $('#zoom1').elevateZoom({zoomWindowPosition: "container1", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollzoom: true});
-    $('#zoom2').elevateZoom({zoomWindowPosition: "container2", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollZoom: true});
-  </script>
+    <img class="binaryPetri" id='zoom1' src="{{blob}}" data-zoom-image="{{blob}}"/>
+    <img class="binaryPetri" id='zoom2' src="{{blobBinary}}" data-zoom-image="{{blobBinary}}"/>
+    <script src='static/jquery-1.8.3.min.js'></script>
+    <script src='static/jquery.elevateZoom-3.0.8.min.js'></script>
+    <script>
+      $('#zoom1').elevateZoom({zoomWindowPosition: "container1", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollZoom: true});
+      $('#zoom2').elevateZoom({zoomWindowPosition: "container2", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollZoom: true});
+    </script>
 </div>
 <div class ="thresholdImages">
   <div style="background-color: white;
@@ -32,7 +32,6 @@
     {% csrf_token %}
     <input type="hidden" name="original" value={{original}}>
     <input type="hidden" name="edit" value = {{edit}}>
-     <!--Input to keep track of first post request to pick page -->
     <input type="hidden" name="fromThresh" value = 0>
 
     <label for="cutoffId">Cutoff</label>
@@ -41,5 +40,18 @@
 
     <button type='submit'>Update Colony Count</button>
   </form>
+</div>
+<a  href="{{coordinates}}" download> Download Coordinates </a>
+<div class="button">
+    <form action='/' method = 'POST'>
+      {% csrf_token %}
+      <input type="hidden" name="original" value={{original}}>
+      <input type="hidden" name="edit" value = {{edit}}>
+      <input type="hidden" name="originalBlob" value={{blob}}>
+      <input type="hidden" name="editBlob" value = {{blobBinary}}>
+      <input type="hidden" name="coordinates" value = {{coordinates}}>
+      <input type="hidden" name="fromPick" value = 1>
+      <button class="pickButton" type='submit'>Finish</button>
+    </form>
 </div>
 {% endblock %}

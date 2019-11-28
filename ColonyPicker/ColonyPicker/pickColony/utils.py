@@ -88,6 +88,7 @@ def analyzeColonies(keyPoints, binaryImage):
         # blobList.append(keyPoint)
     print("%d Viable Colonies Analyzed" % len(blobList))
     return blobList
+
 def rankColonies(blobList):
     darkCutoff = np.percentile(np.array([blob[1] for blob in blobList]), 95)
     whiteCutoff = np.percentile(np.array([blob[0] for blob in blobList]), 50)
@@ -105,3 +106,6 @@ def highlightKeyPoints(originalImage, binaryImage, keypointList, amount):
     binaryKeypoints = cv2.drawKeypoints(binaryImage, keypointList[:amount], np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     originalKeypoints = cv2.drawKeypoints(originalImage, keypointList[:amount], np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     return (binaryKeypoints, originalKeypoints)
+
+def formatKeyPoints(keyPoints, cutoff):
+    return np.asarray([[keyPoint.pt[0], keyPoint.pt[1]] for keyPoint in keyPoints[:cutoff]])

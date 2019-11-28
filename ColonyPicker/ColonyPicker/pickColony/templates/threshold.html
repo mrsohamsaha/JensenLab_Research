@@ -14,9 +14,6 @@
       $('#zoom1').elevateZoom({zoomWindowPosition: "container1", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollZoom: true});
       $('#zoom2').elevateZoom({zoomWindowPosition: "container2", zoomWindowHeight: 200, zoomWindowWidth:200, borderSize: 0, scrollZoom: true});
     </script>
-    <!-- <div style="display: none;" class="dummy">
-      Hello world!
-      </div> -->
 </div>
 <div class ="thresholdImages">
   <div style="background-color: white;
@@ -57,6 +54,16 @@
        <!--Input to keep track of first post request to pick page -->
       <input type="hidden" name="fromThresh" value = 1>
       <button class="pickButton" type='submit'>Pick Colonies</button>
+    </form>
+</div>
+<div class="button">
+    <form action='/' method = 'POST'>
+      {% csrf_token %}
+      <input type="hidden" name="original" value={{url}}>
+      <input type="hidden" name="edit" value = {{thresholdUrl}}>
+       <!--Input to keep track of first post request to pick page -->
+      <input type="hidden" name="fromThresh" value = 1>
+      <button class="pickButton" type='submit'>Start Over</button>
     </form>
 </div>
 {% endblock %}

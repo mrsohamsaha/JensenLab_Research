@@ -15,6 +15,7 @@ from .utils import detectColonies
 from .utils import analyzeColonies
 from .utils import highlightKeyPoints
 from .utils import rankColonies
+from .utils import formatKeyPoints
 
 # global variables
 url = ""
@@ -23,24 +24,38 @@ originalBlobList = None
 
 def home(request):
 	if request.method == 'POST':
-		# Obtaining uploaded image from FILE dict
-		if not request.FILES:
-			raise Http404('Image was not uploaded')
-		uploaded_file = request.FILES['image']
+		if request.POST.get("fromPick", "") == "1":
+			# Delete original, edit, orginalBlob, editBlob, and coordinates
+			os.remove(request.POST.get("original", "")[1:])
+			os.remove(request.POST.get("edit", "")[1:])
+			os.remove(request.POST.get("originalBlob", "")[1:])
+			os.remove(request.POST.get("editBlob", "")[1:])
+			os.remove(request.POST.get("coordinates", "")[1:])
+			print("fromPick")
+			return render(request, 'home.html')
+		elif request.POST.get("fromThresh", "") == "1":
+			os.remove(request.POST.get("original", "")[1:])
+			os.remove(request.POST.get("edit", "")[1:])
+			return render(request, 'home.html')
+		else:
+			# Obtaining uploaded image from FILE dict
+			if not request.FILES:
+				raise Http404('Image was not uploaded')
+			uploaded_file = request.FILES['image']
 
-		# Saving uploaded image in media directory
-		fs = FileSystemStorage()
-		name = fs.save(uploaded_file.name, uploaded_file)
-		url = fs.url(name)
+			# Saving uploaded image in media directory
+			fs = FileSystemStorage()
+			name = fs.save(uploaded_file.name, uploaded_file)
+			url = fs.url(name)
 
-		binaryImage = binaryMask(url[1:], 21, 2)
+			binaryImage = binaryMask(url[1:], 21, 2)
 
-		# Saving thresholded image
-		thresholdName = name[:-4]+'EDIT'+'.jpg'
-		cv2.imwrite('media/'+thresholdName, binaryImage)
-		thresholdUrl = fs.url(thresholdName)
-		outDict = {'url': url, 'thresholdUrl': thresholdUrl, 'blockSize': 21, 'constant': 2}
-		return render(request, 'threshold.html', outDict)
+			# Saving thresholded image
+			thresholdName = name[:-4]+'EDIT'+'.jpg'
+			cv2.imwrite('media/'+thresholdName, binaryImage)
+			thresholdUrl = fs.url(thresholdName)
+			outDict = {'url': url, 'thresholdUrl': thresholdUrl, 'blockSize': 21, 'constant': 2}
+			return render(request, 'threshold.html', outDict)
 	return render(request, 'home.html')
 
 def threshold(request):
@@ -51,7 +66,7 @@ def threshold(request):
 		blockSize = request.POST.get("blockSize", "")
 		constant = request.POST.get("constant", "")
 
-		binaryImage = binaryMask(originalImagePath[1:], blockSize, constant)
+		binaryImage = binaryMask(originalImagePath[1:], int(blockSize), int(constant))
 		cv2.imwrite(binaryImagePath[1:], binaryImage)
 
 		outDict = {'url': originalImagePath, 'thresholdUrl': binaryImagePath, 'blockSize': blockSize, 'constant': constant}
@@ -67,6 +82,7 @@ def pick(request):
 		binaryImage = cv2.imread(binaryImagePath[1:],0)
 		originalImage = cv2.imread(originalImagePath[1:])
 		cutoff = 0
+
 		# Detecting Blobs for first time
 		if fromThresh == "1":
 			keypoints = detectColonies(binaryImage)
@@ -75,16 +91,24 @@ def pick(request):
 			cutoff = len(originalBlobList)
 		else:
 			cutoff = int(request.POST.get("cutoff", ""))
-		# keyPointList = [cv2.KeyPoint(x = blob.pt[0], y = blob.pt[1], _size = blob.size) for blob in originalBlobList]
+
 		binaryKeypoints, originalKeypoints = highlightKeyPoints(originalImage, binaryImage, originalBlobList, cutoff)
-		# Saving images with blob detection
+		coordinates = formatKeyPoints(originalBlobList, cutoff)
+
+		# Saving images and coordinates
 		fs = FileSystemStorage()
 		name = originalImagePath[7:-4] + "BLOB" + ".jpg"
 		nameBinary = binaryImagePath[7:-4] + "BLOB" + ".jpg"
-		cv2.imwrite('media/'+name, originalKeypoints)
-		cv2.imwrite('media/'+nameBinary, binaryKeypoints)
+		coordinateName = "colonyCoordinates.csv"
+
+		cv2.imwrite('media/'+ name, originalKeypoints)
+		cv2.imwrite('media/'+ nameBinary, binaryKeypoints)
+		np.savetxt('media/' + coordinateName, coordinates, delimiter=",")
+
 		blobUrl = fs.url(name)
 		blobUrlBinary = fs.url(nameBinary)
-		outDict = {"original": originalImagePath, "edit": binaryImagePath, "blob": blobUrl, "blobBinary": blobUrlBinary, "count": len(originalBlobList), "cutoff": cutoff}
+		coordinateUrl = fs.url(coordinateName)
+
+		outDict = {"original": originalImagePath, "edit": binaryImagePath, "blob": blobUrl, "blobBinary": blobUrlBinary, "coordinates": coordinateUrl, "count": len(originalBlobList), "cutoff": cutoff}
 		return render(request, 'pick.html', outDict)
 	return render(request, 'pick.html')
