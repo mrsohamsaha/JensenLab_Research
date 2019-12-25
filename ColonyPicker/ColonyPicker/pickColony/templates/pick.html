@@ -41,7 +41,9 @@
     <button type='submit'>Update Colony Count</button>
   </form>
 </div>
-<a  href="{{coordinates}}" download> Download Coordinates </a>
+<div class="button">
+  <a  href="{{coordinates}}" download><button class="pickButton" type='submit'>Download Coordinates</button></a>
+</div>
 <div class="button">
     <form action='/' method = 'POST'>
       {% csrf_token %}
@@ -51,7 +53,7 @@
       <input type="hidden" name="editBlob" value = {{blobBinary}}>
       <input type="hidden" name="coordinates" value = {{coordinates}}>
       <input type="hidden" name="fromPick" value = 1>
-      <button class="pickButton" type='submit'>Finish</button>
+      <button class="endButton" type='submit'>Finish</button>
     </form>
 </div>
 {% endblock %}

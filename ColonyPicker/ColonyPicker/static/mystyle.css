@@ -18,6 +18,10 @@
   justify-content: center;
 }
 
+.endButton {
+  background-color:#F80A0A ; /* Red */
+}
+
 .pickButton {
   background-color: #4CAF50; /* Green */
 }
