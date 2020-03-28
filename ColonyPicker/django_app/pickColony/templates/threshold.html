@@ -2,12 +2,12 @@
 {% block content %}
 <h1>Thresholding</h1>
 <div class="thresholdImages">
-  <h3>Block Size: {{blockSize}}      Constant: {{constant}}</h3>
+  <h3>Block Size: {{ block_size }}      Constant: {{constant}}</h3>
   <!-- <h3></h3> -->
 </div>
 <div class="thresholdImages">
     <img class="binaryPetri" id='zoom1' src="{{url}}" data-zoom-image="{{url}}"/>
-    <img class="binaryPetri" id='zoom2' src="{{thresholdUrl}}" data-zoom-image="{{thresholdUrl}}"/>
+    <img class="binaryPetri" id='zoom2' src="{{ threshold_url }}" data-zoom-image="{{ threshold_url }}"/>
     <script src='static/jquery-1.8.3.min.js'></script>
     <script src='static/jquery.elevateZoom-3.0.8.min.js'></script>
     <script>
@@ -33,15 +33,15 @@
   <form action='threshold' method = 'POST'>
     {% csrf_token %}
     <input type="hidden" name="original" value={{url}}>
-    <input type="hidden" name="edit" value = {{thresholdUrl}}>
+    <input type="hidden" name="edit" value = {{ threshold_url }}>
 
     <label for="blockSizeId">Block Size</label>
-    <input type="range" name="blockSize" id="blockSizeId" value={{blockSize}} min=1 max="49" step="2" oninput="blockSizeOutId.value = blockSizeId.value">
-    <output name="blockSizeOut" id="blockSizeOutId">{{blockSize}}</output>
+    <input type="range" name="block_size" id="blockSizeId" value={{ block_size }} min=1 max="49" step="2" oninput="blockSizeOutId.value = blockSizeId.value">
+    <output name="blockSizeOut" id="blockSizeOutId">{{ block_size }}</output>
 
     <label for="constantId">Constant</label>
-    <input type="range" name="constant" id="constantId" value={{constant}} min="1" max="7" step="1" oninput="constantOutId.value = constantId.value">
-    <output name="constantOut" id="constantOutId">{{constant}}</output>
+    <input type="range" name="constant" id="constantId" value={{ constant }} min="1" max="7" step="1" oninput="constantOutId.value = constantId.value">
+    <output name="constantOut" id="constantOutId">{{ constant }}</output>
 
     <button type='submit'>Update Threshold</button>
   </form>
@@ -50,9 +50,9 @@
     <form action='pick' method = 'POST'>
       {% csrf_token %}
       <input type="hidden" name="original" value={{url}}>
-      <input type="hidden" name="edit" value = {{thresholdUrl}}>
+      <input type="hidden" name="edit" value = {{ threshold_url }}>
        <!--Input to keep track of first post request to pick page -->
-      <input type="hidden" name="fromThresh" value = 1>
+      <input type="hidden" name="from_thresh" value = 1>
       <button class="pickButton" type='submit'>Pick Colonies</button>
     </form>
 </div>
@@ -60,9 +60,9 @@
     <form action='/' method = 'POST'>
       {% csrf_token %}
       <input type="hidden" name="original" value={{url}}>
-      <input type="hidden" name="edit" value = {{thresholdUrl}}>
+      <input type="hidden" name="edit" value = {{ threshold_url }}>
        <!--Input to keep track of first post request to pick page -->
-      <input type="hidden" name="fromThresh" value = 1>
+      <input type="hidden" name="from_thresh" value = 1>
       <button class="endButton" type='submit'>Start Over</button>
     </form>
 </div>
