@@ -2,7 +2,7 @@
 Contains all views for web application.
 """
 
-# Django
+# django
 from django.shortcuts import render
 from django.core.files.storage import FileSystemStorage
 from django.http import Http404
@@ -13,12 +13,10 @@ import cv2
 import numpy as np
 
 # utility functions
-from .utils import binaryMask, detectColonies, analyzeColonies, highlightKeyPoints, rankColonies, formatKeyPoints
+from .utils import binary_mask, detect_colonies, analyze_colonies, highlight_key_points, rank_colonies, format_key_points
 
 # global variables
-url = ""
-thresholdUrl = ""
-original_blob_list = None
+original_blob_list = []
 DEFAULT_BLOCK_SIZE = 21
 DEFAULT_CONSTANT = 2
 
@@ -50,7 +48,7 @@ def home(request):
             name = fs.save(uploaded_file.name, uploaded_file)
             url = fs.url(name)
 
-            binary_image = binaryMask(url[1:], DEFAULT_BLOCK_SIZE, DEFAULT_CONSTANT)
+            binary_image = binary_mask(url[1:], DEFAULT_BLOCK_SIZE, DEFAULT_CONSTANT)
 
             # Saving binary image
             threshold_name = name[:-4] + 'EDIT' + '.jpg'
@@ -77,7 +75,7 @@ def threshold(request):
         constant = request.POST.get("constant", "")
         print(request.POST.dict())
 
-        binary_image = binaryMask(original_image_path[1:], int(block_size), int(constant))
+        binary_image = binary_mask(original_image_path[1:], int(block_size), int(constant))
         cv2.imwrite(binary_image_path[1:], binary_image)
 
         content = {'url': original_image_path, 'threshold_url': binary_image_path, 'block_size': block_size,
@@ -98,20 +96,19 @@ def pick(request):
         from_thresh = request.POST.get("from_thresh", "")
         binary_image = cv2.imread(binary_image_path[1:], 0)
         original_image = cv2.imread(original_image_path[1:])
-        cutoff = 0
 
         # Detecting Blobs for first time
         if from_thresh == "1":
-            key_points = detectColonies(binary_image)
-            blob_list = analyzeColonies(key_points, binary_image)
-            original_blob_list = rankColonies(blob_list)
+            key_points = detect_colonies(binary_image)
+            blob_list = analyze_colonies(key_points, binary_image)
+            original_blob_list = rank_colonies(blob_list)
             cutoff = len(original_blob_list)
         else:
             cutoff = int(request.POST.get("cutoff", ""))
 
-        binary_key_points, original_key_points = highlightKeyPoints(original_image, binary_image,
-                                                                    original_blob_list, cutoff)
-        coordinates = formatKeyPoints(original_blob_list, cutoff)
+        binary_key_points, original_key_points = highlight_key_points(original_image, binary_image,
+                                                                      original_blob_list, cutoff)
+        coordinates = format_key_points(original_blob_list, cutoff)
 
         # Saving images and coordinates
         fs = FileSystemStorage()
@@ -129,6 +126,6 @@ def pick(request):
 
         content = {"original": original_image_path, "edit": binary_image_path, "blob": blob_url,
                    "blob_binary": blob_url_binary, "coordinates": coordinate_url,
-                   "count": len(original_blob_list), "cutoff": cutoff}
+                   "count": len(original_blob_list), "count": cutoff}
         return render(request, 'pick.html', content)
     return render(request, 'pick.html')
